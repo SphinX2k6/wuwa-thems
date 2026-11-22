@@ -1,0 +1,583 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Theme: Changli — Weiqi Dusk
+   Palette extracted from the twilight Weiqi pavilion scene:
+     - Night Sky Slate     #14161d / #1a1f27
+     - Smoked Mahogany     rgba(26, 19, 21, 0.72) + 14px glass blur
+     - Vermilion Plume     #e86555 → #c94c4b
+     - Lantern Amber-Gold  #f5c77e / #e6b570
+     - Ivory Weiqi Stone   #f4ede2
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Full-bleed Changli Weiqi Dusk backdrop with warm lantern vignette.
+   The artwork lives on <html> so it propagates to the canvas — the
+   very bottom of the paint stack. That lets body::before/::after
+   ambient layers sit ABOVE the art but below all content. */
+html {
+  background-color: #14161d;
+  background-image:
+    radial-gradient(circle at 60% 34%, rgba(232, 101, 85, 0.10) 0%, transparent 48%),
+    radial-gradient(circle at 92% 44%, rgba(248, 252, 194, 0.12) 0%, transparent 34%),
+    linear-gradient(180deg, rgba(16, 19, 26, 0.50) 0%, rgba(20, 15, 17, 0.38) 50%, rgba(24, 13, 11, 0.68) 100%),
+    var(--theme-bg-image, url("/styles/changli/bg.webp"));
+  background-position: center, center, center, center 36%;
+  background-size: cover, cover, cover, cover;
+  background-repeat: no-repeat;
+}
+body {
+  background: transparent;
+}
+
+/* Hide corner mascot cutout so Changli's full backdrop stays unobstructed */
+.mascot {
+  display: none !important;
+}
+
+/* Glass tuning — --glass-o drives surface alpha AND backdrop blur.
+   !important beats the manifest vars inlined on <html> while this
+   theme is active; they return untouched when the theme unloads. */
+:root {
+  --glass-o: 0.74;
+  --bg-card: rgba(26, 19, 21, var(--glass-o)) !important;
+  --bg-raised: rgba(46, 32, 33, calc(var(--glass-o) * 1.09)) !important;
+  --bg-sunken: rgba(16, 14, 18, calc(var(--glass-o) * 1.03)) !important;
+  --bg-input: rgba(16, 14, 18, calc(var(--glass-o) * 1.16)) !important;
+}
+
+/* Frosted mahogany & twilight lacquer glass across all workspace surfaces */
+.topbar {
+  background: rgba(18, 15, 20, var(--glass-o));
+  backdrop-filter: blur(calc(var(--glass-o) * 21.5px)) saturate(140%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-o) * 21.5px)) saturate(140%);
+  border-bottom: 1px solid rgba(230, 181, 112, 0.24);
+}
+.topbar::before {
+  background: linear-gradient(90deg, transparent, rgba(245, 199, 126, 0.55) 35%, rgba(232, 101, 85, 0.65) 65%, transparent);
+}
+.wordmark {
+  color: #f4ede2;
+  text-shadow: 0 0 16px rgba(232, 101, 85, 0.45), 0 0 4px rgba(245, 199, 126, 0.25);
+}
+.brand-logo-wrap {
+  border-color: rgba(245, 199, 126, 0.45);
+  box-shadow: 0 0 14px rgba(232, 101, 85, 0.30);
+}
+.brand-logo-wrap::after {
+  background: #f5c77e;
+  box-shadow: 0 0 7px #f5c77e;
+}
+
+.sidebar,
+.panel,
+.console-panel,
+.card,
+.wm-card,
+.wm-detail,
+.user-card,
+.loader-card,
+.modal {
+  backdrop-filter: blur(calc(var(--glass-o) * 19px)) saturate(135%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-o) * 19px)) saturate(135%);
+  box-shadow: 0 10px 28px -10px rgba(8, 5, 6, 0.65), inset 0 1px 0 rgba(255, 236, 209, 0.06);
+}
+
+/* Golden Weiqi gridline specular highlights on cards */
+.card::before,
+.wm-card::before,
+.wm-detail::before,
+.loader-card::before {
+  background: linear-gradient(90deg, transparent, rgba(245, 199, 126, 0.40) 35%, rgba(232, 101, 85, 0.45) 65%, transparent);
+}
+
+.card:hover,
+.wm-card:hover {
+  background: rgba(38, 26, 28, 0.80);
+  border-color: rgba(245, 199, 126, 0.42);
+}
+
+.card.active,
+.wm-card.sel {
+  background: rgba(36, 23, 24, 0.82);
+  border-color: rgba(232, 101, 85, 0.75);
+  box-shadow: 0 0 0 1px rgba(232, 101, 85, 0.55), 0 8px 24px -6px rgba(232, 101, 85, 0.32);
+}
+
+.card.active .card-icon,
+.card.active .cat-badge {
+  color: var(--accent-soft);
+  border-color: rgba(245, 199, 126, 0.42);
+  background: rgba(232, 101, 85, 0.16);
+}
+
+/* Sidebar navigation — vermilion ember rail + lantern gold active label */
+.nav-item:hover {
+  background: rgba(230, 181, 112, 0.10);
+}
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(232, 101, 85, 0.22) 0%, rgba(230, 181, 112, 0.08) 100%);
+  border-color: rgba(245, 199, 126, 0.34);
+  color: var(--accent-soft);
+}
+.nav-item.active svg {
+  color: var(--accent);
+}
+/* Count badges — small cinnabar seal stamps */
+.nav-count {
+  border-radius: 3px;
+  background: linear-gradient(160deg, #c04945 0%, #8f3534 100%);
+  color: #f6e8d4;
+  border: 1px solid rgba(245, 199, 126, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(255, 238, 214, 0.12), 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.nav-item.active .nav-count {
+  background: linear-gradient(160deg, #d8594f 0%, #b03f3b 100%);
+  color: #fff8ee;
+  border-color: rgba(245, 199, 126, 0.50);
+  box-shadow: inset 0 0 0 1px rgba(255, 238, 214, 0.16), 0 0 8px rgba(232, 101, 85, 0.35);
+}
+
+/* Toggle switch — Weiqi stones, not switches.
+   OFF: an obsidian stone resting in a carved board groove. */
+.switch {
+  background: linear-gradient(180deg, rgba(10, 8, 9, 0.92), rgba(22, 16, 15, 0.92));
+  border-color: rgba(230, 181, 112, 0.16);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.60), inset 0 -1px 0 rgba(230, 181, 112, 0.08);
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+}
+.switch .knob {
+  background: radial-gradient(circle at 34% 28%, #57504c 0%, #332c2b 48%, #1a1516 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.65), inset -1px -1px 3px rgba(0, 0, 0, 0.45), inset 1px 1px 1px rgba(255, 240, 220, 0.08);
+  transition: transform 0.15s, background 0.15s, box-shadow 0.2s;
+}
+/* ON: a shell-ivory stone catching lantern light */
+.switch.on {
+  background: linear-gradient(180deg, rgba(64, 36, 28, 0.95), rgba(40, 24, 20, 0.95));
+  border-color: rgba(245, 199, 126, 0.50);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.55), 0 0 12px rgba(245, 199, 126, 0.16);
+}
+.switch.on .knob {
+  background: radial-gradient(circle at 34% 28%, #fffdf6 0%, #f6e9d2 52%, #e2c49a 100%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.50), 0 0 9px rgba(245, 199, 126, 0.55), inset -1px -1px 3px rgba(150, 100, 55, 0.40);
+}
+
+/* Primary & apply buttons — Changli vermilion-gold gradient */
+.btn-primary,
+.btn-apply,
+.wm-btn:not(.ghost):not(.danger),
+.tp-btn.accent {
+  background: linear-gradient(135deg, #e86555 0%, #c94c4b 100%);
+  color: #fff8f0;
+  border: 1px solid rgba(245, 199, 126, 0.38);
+  box-shadow: 0 0 14px rgba(232, 101, 85, 0.28);
+}
+.btn-primary:hover:not(:disabled),
+.btn-apply:hover:not(:disabled),
+.wm-btn:not(.ghost):not(.danger):hover:not(:disabled),
+.tp-btn.accent:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f27868 0%, #d85654 100%);
+  box-shadow: 0 0 18px rgba(232, 101, 85, 0.50);
+}
+
+/* Combo dropdowns & hover states */
+.combo-btn:hover,
+.tp-btn:hover {
+  border-color: rgba(245, 199, 126, 0.55);
+  background: rgba(56, 38, 39, 0.88);
+}
+.combo-menu {
+  background: rgba(24, 18, 20, 0.94);
+  backdrop-filter: blur(16px);
+  border-color: rgba(245, 199, 126, 0.38);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.72), 0 0 0 1px rgba(232, 101, 85, 0.16);
+}
+.combo-opt.sel {
+  background: rgba(232, 101, 85, 0.18);
+  border-left-color: var(--accent);
+  color: var(--accent-soft);
+}
+
+/* Custom scrollbar — vermilion & amber beam */
+* {
+  scrollbar-color: rgba(232, 101, 85, 0.45) transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(245, 199, 126, 0.55), rgba(232, 101, 85, 0.35));
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(245, 199, 126, 0.85), rgba(232, 101, 85, 0.65));
+  background-clip: padding-box;
+}
+
+/* Console & loading overlay — the board itself: faint 19×19 grid
+   showing through dark lacquer, rimmed by a double gold hairline */
+.console-panel {
+  position: relative;
+  background-image: radial-gradient(120% 55% at 50% 0%, rgba(245, 199, 126, 0.06) 0%, transparent 60%);
+}
+.console-output {
+  background-color: rgba(14, 10, 11, 0.80);
+  background-image:
+    linear-gradient(rgba(230, 181, 112, 0.030) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230, 181, 112, 0.030) 1px, transparent 1px);
+  background-size: 26px 26px;
+  border-color: rgba(230, 181, 112, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(230, 181, 112, 0.10), inset 0 3px 12px rgba(0, 0, 0, 0.50);
+}
+.loading-overlay {
+  background:
+    radial-gradient(circle at 55% 40%, rgba(232, 101, 85, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(16, 19, 26, 0.82) 0%, rgba(20, 14, 15, 0.88) 100%),
+    var(--theme-bg-image, url("/styles/changli/bg.webp")) center 36% / cover no-repeat;
+}
+
+/* ═══ Ornament layer — the board, applied with discipline ═══ */
+
+/* Active nav item — vertical vermilion→amber plume instead of flat bar */
+.nav-item.active::before {
+  width: 3px;
+  top: 6px;
+  bottom: 6px;
+  background: linear-gradient(180deg, #f5c77e 0%, #e86555 55%, #c94c4b 100%);
+  box-shadow: 0 0 10px rgba(232, 101, 85, 0.60), 1px 0 6px rgba(245, 199, 126, 0.25);
+}
+.nav-item.active svg {
+  color: #f5c77e;
+  filter: drop-shadow(0 0 4px rgba(245, 199, 126, 0.40));
+}
+
+/* Detail panel — lantern bloom at the top edge + faint board grid */
+.wm-detail {
+  background-image:
+    radial-gradient(120% 40% at 50% 0%, rgba(245, 199, 126, 0.07) 0%, transparent 55%),
+    linear-gradient(rgba(230, 181, 112, 0.030) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230, 181, 112, 0.030) 1px, transparent 1px);
+  background-size: auto, 26px 26px, 26px 26px;
+}
+
+/* Sub-section labels carry a tiny star point (hoshi) */
+.subpanel-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.subpanel-title::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+  background: rgba(245, 199, 126, 0.55);
+  transform: rotate(45deg);
+  box-shadow: 0 0 5px rgba(245, 199, 126, 0.35);
+}
+
+/* Always-on marker — amber diamond, not a plain dot */
+.always-on-badge::before {
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  transform: rotate(45deg);
+  background: var(--accent-soft);
+  box-shadow: 0 0 6px rgba(245, 199, 126, 0.50);
+}
+
+/* Panel titles — icon catches lantern light */
+.panel-title svg {
+  filter: drop-shadow(0 0 5px rgba(245, 199, 126, 0.35));
+}
+
+/* Focus states — Weiqi-gold ring on lacquer inputs */
+.field:focus {
+  border-color: rgba(245, 199, 126, 0.55);
+  box-shadow: 0 0 0 1px rgba(245, 199, 126, 0.18), 0 0 12px rgba(245, 199, 126, 0.10);
+}
+.side-search .search-wrap:focus-within {
+  border-color: rgba(245, 199, 126, 0.55);
+  box-shadow: 0 0 0 1px rgba(245, 199, 126, 0.18), 0 0 12px rgba(245, 199, 126, 0.10);
+}
+.combo.open .combo-btn {
+  border-color: rgba(245, 199, 126, 0.55);
+  box-shadow: 0 0 0 1px rgba(245, 199, 126, 0.25), 0 0 12px rgba(245, 199, 126, 0.15);
+}
+
+/* Ember-lit status dots */
+.status-pill.ready .status-dot::before {
+  box-shadow: 0 0 7px rgba(126, 201, 155, 0.75);
+}
+.status-pill.attached .status-dot::before {
+  box-shadow: 0 0 7px rgba(245, 199, 126, 0.80);
+}
+.tech-tag.online::before {
+  box-shadow: 0 0 7px rgba(126, 201, 155, 0.75);
+}
+
+/* Selection — cinnabar wash */
+::selection {
+  background: rgba(201, 76, 75, 0.60);
+  color: #fff6ea;
+}
+
+/* ═══ Ambient layer — candlelit dusk air ═══
+   Four pseudo-layers above the artwork, below the UI (z-index:-1):
+     html::before → volumetric lantern shafts sweeping the sky
+     html::after  → breathing dusk vignette at the edges
+     body::before → warm bokeh orbs drifting slowly at depth
+     body::after  → cinnabar phoenix petals wafting down             */
+
+/* God rays — two diagonal shafts of lantern light sweeping slowly */
+html::before {
+  content: '';
+  position: fixed;
+  top: -15%;
+  left: -20%;
+  width: 150vw;
+  height: 60vh;
+  z-index: -1;
+  pointer-events: none;
+  transform-origin: top left;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(245, 199, 126, 0.14) 32%, rgba(232, 101, 85, 0.07) 58%, transparent 100%),
+    linear-gradient(90deg, transparent 12%, rgba(255, 216, 153, 0.10) 44%, transparent 82%);
+  background-size: 100% 55%, 100% 34%;
+  background-position: 0 0, 0 70%;
+  background-repeat: no-repeat;
+  filter: blur(34px);
+  transform: rotate(-38deg);
+  animation: ray-breathe 13s ease-in-out infinite;
+}
+@keyframes ray-breathe {
+  0%, 100% { opacity: 0.55; transform: rotate(-38deg)   translateY(0)   scaleY(1); }
+  50%      { opacity: 0.90; transform: rotate(-36.5deg) translateY(-2%) scaleY(1.08); }
+}
+
+/* Breathing vignette — dusk tightens and loosens around the edges */
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(125% 125% at 50% 42%, transparent 52%, rgba(9, 10, 14, 0.38) 82%, rgba(7, 8, 11, 0.62) 100%);
+  animation: vig-breathe 10s ease-in-out infinite alternate;
+}
+@keyframes vig-breathe {
+  from { opacity: 0.55; }
+  to   { opacity: 1; }
+}
+
+/* Bokeh orbs — large soft lantern glows drifting at depth.
+   Each box-shadow is one blurred orb; the whole field floats. */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+  background: transparent;
+  box-shadow:
+    24vw 30vh 80px 55px rgba(245, 199, 126, 0.13),
+    48vw 54vh 70px 48px rgba(255, 122, 102, 0.11),
+    68vw 78vh 90px 62px rgba(245, 199, 126, 0.10),
+    78vw 16vh 55px 38px rgba(255, 216, 153, 0.14),
+    15vw 68vh 60px 42px rgba(232, 101, 85, 0.09),
+    88vw 55vh 65px 45px rgba(245, 199, 126, 0.08);
+  animation: orb-float 22s ease-in-out infinite;
+}
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1);             opacity: 0.85; }
+  50%      { transform: translate(2.2vw, -3vh) scale(1.06);   opacity: 1; }
+}
+
+/* Phoenix petals — cinnabar feather motes wafting down through the
+   air. The leaf silhouette comes from the element's border-radius;
+   every box-shadow inherits it and tumbles with the field. */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 7px;
+  border-radius: 95% 8% 95% 8%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(232, 101, 85, 0.55);
+  box-shadow:
+    12vw 8vh  3px 0 rgba(232, 101, 85, 0.45),
+    26vw -4vh 4px 0 rgba(245, 199, 126, 0.40),
+    41vw 12vh 2px 0 rgba(201, 76, 75, 0.50),
+    55vw 2vh  3px 0 rgba(232, 101, 85, 0.42),
+    69vw 15vh 4px 0 rgba(245, 199, 126, 0.36),
+    83vw 5vh  3px 0 rgba(201, 76, 75, 0.48),
+    94vw 18vh 2px 0 rgba(232, 101, 85, 0.40),
+    33vw 22vh 3px 0 rgba(255, 122, 102, 0.38);
+  animation: petal-fall 17s linear infinite;
+}
+@keyframes petal-fall {
+  0%   { transform: translate(0, -12vh) rotate(38deg);   opacity: 0; }
+  12%  { opacity: 0.80; }
+  80%  { opacity: 0.55; }
+  100% { transform: translate(6vw, 108vh) rotate(58deg); opacity: 0; }
+}
+
+/* ═══ Notifications — a stone placed on the board ═══
+   Each alert arrives like a Weiqi stone set down on lacquer: the tile
+   clicks in with a small overshoot, a ring of light ripples out from
+   the stone, and the type reads as the stone itself — obsidian for
+   info, ivory-jade for success, hot vermilion for error. */
+
+.notif-container {
+  top: 60px;
+  right: 18px;
+  gap: 10px;
+}
+
+.notif {
+  gap: 12px;
+  padding: 12px 18px 12px 14px;
+  background:
+    radial-gradient(120% 60% at 12% 0%, rgba(245, 199, 126, 0.08) 0%, transparent 55%),
+    linear-gradient(rgba(230, 181, 112, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(230, 181, 112, 0.05) 1px, transparent 1px),
+    rgba(22, 15, 15, 0.94);
+  background-size: auto, 22px 22px, 22px 22px, auto;
+  border-color: rgba(230, 181, 112, 0.28);
+  border-radius: 12px;
+  box-shadow: 0 10px 26px -6px rgba(0, 0, 0, 0.75), inset 0 0 0 1px rgba(230, 181, 112, 0.06);
+  animation: stone-place 0.5s cubic-bezier(0.2, 1.1, 0.3, 1);
+}
+@keyframes stone-place {
+  0%   { opacity: 0; transform: translateY(-14px) scale(0.90); }
+  60%  { opacity: 1; transform: translateY(1px)  scale(1.02); }
+  100% { transform: translateY(0)    scale(1); }
+}
+
+/* Light ripple — a ring rings out from the stone as it lands */
+.notif::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(245, 199, 126, 0.85);
+  box-shadow: 0 0 10px rgba(245, 199, 126, 0.40), inset 0 0 6px rgba(245, 199, 126, 0.30);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.2);
+  animation: stone-ripple 0.7s cubic-bezier(0.2, 0.6, 0.3, 1) 0.15s 1 both;
+}
+.notif.error::after {
+  border-color: rgba(255, 143, 133, 0.85);
+  box-shadow: 0 0 10px rgba(255, 95, 82, 0.45), inset 0 0 6px rgba(255, 143, 133, 0.30);
+}
+@keyframes stone-ripple {
+  0%   { transform: scale(0.25); opacity: 0.9; }
+  100% { transform: scale(2.8);  opacity: 0; }
+}
+
+/* The stone — obsidian (info), ivory-jade (success), hot vermilion (error) */
+.notif-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 26%, #6a625e 0%, #2c2525 48%, #141010 100%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.60), inset 1px 1px 2px rgba(255, 240, 220, 0.12), 0 0 8px rgba(245, 199, 126, 0.25);
+}
+.notif.success .notif-dot {
+  background: radial-gradient(circle at 32% 26%, #fffdf6 0%, #f2e7d0 55%, #dcc199 100%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.50), 0 0 10px rgba(245, 199, 126, 0.70), inset -1px -1px 3px rgba(150, 100, 55, 0.40);
+}
+.notif.error .notif-dot {
+  background: radial-gradient(circle at 32% 26%, #ffd2c4 0%, #ff6a52 50%, #8f1d1d 100%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.55), 0 0 12px rgba(255, 95, 82, 0.80), inset -1px -1px 3px rgba(90, 10, 5, 0.50);
+}
+
+/* Top hairline — the board's gold edge instead of a side bar */
+.notif::before {
+  left: 14%;
+  right: 14%;
+  top: 0;
+  bottom: auto;
+  width: auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(245, 199, 126, 0.45) 50%, transparent);
+  box-shadow: none;
+}
+
+/* Type-tinted lacquer + borders */
+.notif.success {
+  background-color: rgba(20, 22, 17, 0.94);
+  border-color: rgba(245, 199, 126, 0.40);
+}
+.notif.error {
+  background-color: rgba(30, 15, 13, 0.94);
+  border-color: rgba(255, 95, 82, 0.42);
+}
+
+/* Exit — the stone is lifted off the board */
+.notif.out {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.94);
+  transition: opacity 0.28s, transform 0.28s;
+}
+
+/* Repeat hit — the stone gets tapped again, quick downward thud */
+.notif.bump {
+  animation: stone-thud 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+@keyframes stone-thud {
+  0%   { transform: translateY(0); }
+  45%  { transform: translateY(2.5px) scale(0.98); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Repeat counter — a miniature cinnabar seal */
+.notif-count {
+  border-radius: 3px;
+  background: linear-gradient(160deg, #c04945 0%, #8f3534 100%);
+  color: #f6e8d4;
+  border: 1px solid rgba(245, 199, 126, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(255, 238, 214, 0.12);
+}
+
+/* ═══ User tuning hooks — toggled from Settings → Theme & Style ═══ */
+
+/* Ambient off — all four dusk-air layers vanish at once */
+html.no-ambient::before,
+html.no-ambient::after,
+html.no-ambient body::before,
+html.no-ambient body::after {
+  display: none;
+}
+
+/* Grid off — the 19×19 board lines lift; glows and lacquer stay */
+html.no-grid .console-output {
+  background-image: none;
+}
+html.no-grid .wm-detail {
+  background-image: radial-gradient(120% 40% at 50% 0%, rgba(245, 199, 126, 0.07) 0%, transparent 55%);
+  background-size: auto;
+}
+html.no-grid .notif {
+  background-image: radial-gradient(120% 60% at 12% 0%, rgba(245, 199, 126, 0.08) 0%, transparent 55%);
+  background-size: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html::before,
+  html::after,
+  body::before,
+  body::after,
+  .notif::before,
+  .notif::after,
+  .notif-dot {
+    animation: none;
+  }
+}
