@@ -1,0 +1,825 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Theme: Hsin — Kitsune Momiji Mirror
+   Palette extracted from the midnight mirror-pond scene:
+     - Mirror Pond Obsidian   #0d090c
+     - Urushi Black-Garnet    rgba(20, 12, 16, 0.72) + 15px glass blur
+     - Momiji Scarlet         #d92b38 → #9e1924
+     - Kanzashi Molten Gold   #f2b84b / #ffd97d
+     - Kitsune Moonlight      #f5f0f6 / #d8cedc
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Full-bleed Hsin Momiji Mirror backdrop with moonlight-plum vignette.
+   The artwork lives on <html> so it propagates to the canvas — the
+   very bottom of the paint stack. That lets body::before/::after
+   ambient layers sit ABOVE the art but below all content. */
+/* Kitsune type system — Marcellus shrine-inscription capitals for the
+   wordmark and page titles, Manrope's tall moonlight letterforms for UI.
+   Falls back silently to system sans when offline. */
+@import url('https://fonts.googleapis.com/css2?family=Marcellus&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+html {
+  background-color: #0d090c;
+  background-image:
+    radial-gradient(ellipse 74% 70% at 50% 56%, rgba(10, 6, 9, 0.34) 0%, transparent 82%),
+    radial-gradient(circle at 34% 28%, rgba(217, 43, 56, 0.10) 0%, transparent 46%),
+    radial-gradient(circle at 86% 66%, rgba(242, 184, 75, 0.11) 0%, transparent 38%),
+    linear-gradient(180deg, rgba(9, 6, 10, 0.48) 0%, rgba(11, 7, 10, 0.38) 50%, rgba(8, 4, 7, 0.62) 100%),
+    var(--theme-bg-image, url("/styles/hsin/bg.webp"));
+  background-position: center, center, center, center, center 40%;
+  background-size: cover, cover, cover, cover, cover;
+  background-repeat: no-repeat;
+}
+body {
+  background: transparent;
+}
+
+/* Hide corner mascot cutout so Hsin's full backdrop stays unobstructed */
+.mascot {
+  display: none !important;
+}
+
+/* Inline SVG motif library — crisp vector ornaments reused everywhere.
+   Masks read alpha only; fill colors are baked for direct icon use. */
+:root {
+  /* 4-petal gilded kanzashi star-blossom (Hsin's hairpin) */
+  --hsin-kanzashi: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 2 C58 20 65 30 84 50 C65 70 58 80 50 98 C42 80 35 70 16 50 C35 30 42 20 50 2 Z' fill='black'/><circle cx='50' cy='50' r='9' fill='black'/></svg>");
+  /* 5-lobed autumn maple leaf (momiji) in three baked colorways */
+  --hsin-leaf-scarlet: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 4 L58 22 L76 14 L70 32 L90 34 L74 46 L88 60 L66 58 L70 78 L54 62 L52 86 L48 86 L46 62 L30 78 L34 58 L12 60 L26 46 L10 34 L30 32 L24 14 L42 22 Z' fill='%23d92b38'/></svg>");
+  --hsin-leaf-gold: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 4 L58 22 L76 14 L70 32 L90 34 L74 46 L88 60 L66 58 L70 78 L54 62 L52 86 L48 86 L46 62 L30 78 L34 58 L12 60 L26 46 L10 34 L30 32 L24 14 L42 22 Z' fill='%23f2b84b' fill-opacity='0.9'/></svg>");
+  --hsin-leaf-crimson: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 4 L58 22 L76 14 L70 32 L90 34 L74 46 L88 60 L66 58 L70 78 L54 62 L52 86 L48 86 L46 62 L30 78 L34 58 L12 60 L26 46 L10 34 L30 32 L24 14 L42 22 Z' fill='%239e1924'/></svg>");
+  /* Maskable leaf (alpha only — element background supplies the color) */
+  --hsin-leaf-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 4 L58 22 L76 14 L70 32 L90 34 L74 46 L88 60 L66 58 L70 78 L54 62 L52 86 L48 86 L46 62 L30 78 L34 58 L12 60 L26 46 L10 34 L30 32 L24 14 L42 22 Z' fill='black'/></svg>");
+}
+
+/* Glass tuning — --glass-o drives surface alpha AND backdrop blur.
+   !important beats the manifest vars inlined on <html> while this
+   theme is active; they return untouched when the theme unloads. */
+:root {
+  --glass-o: 0.74;
+  --bg-card: rgba(18, 11, 15, var(--glass-o)) !important;
+  --bg-raised: rgba(36, 20, 26, calc(var(--glass-o) * 1.13)) !important;
+  --bg-sunken: rgba(11, 7, 10, calc(var(--glass-o) * 1.10)) !important;
+  --bg-input: rgba(11, 7, 10, calc(var(--glass-o) * 1.22)) !important;
+  --font-ui: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Frosted urushi black-garnet lacquer across all workspace surfaces */
+.topbar {
+  background: rgba(15, 10, 14, var(--glass-o));
+  backdrop-filter: blur(calc(var(--glass-o) * 21px)) saturate(145%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-o) * 21px)) saturate(145%);
+  border-bottom: 1px solid rgba(242, 184, 75, 0.24);
+}
+.topbar::before {
+  background: linear-gradient(90deg, transparent, rgba(242, 184, 75, 0.45) 40%, rgba(217, 43, 56, 0.50) 62%, transparent);
+}
+.wordmark {
+  color: #f5f0f6;
+  font-family: 'Marcellus', 'Manrope', serif;
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow: 0 0 16px rgba(217, 43, 56, 0.50), 0 0 5px rgba(242, 184, 75, 0.30);
+}
+/* Momiji leaf crest before the wordmark */
+.wordmark::before {
+  content: '';
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: -2px;
+  margin-right: 7px;
+  background: linear-gradient(160deg, #ec3e4b 0%, #9e1924 100%);
+  -webkit-mask: var(--hsin-leaf-mask) center / contain no-repeat;
+  mask: var(--hsin-leaf-mask) center / contain no-repeat;
+  filter: drop-shadow(0 0 5px rgba(217, 43, 56, 0.60));
+}
+.brand-logo-wrap {
+  border-color: rgba(242, 184, 75, 0.45);
+  box-shadow: 0 0 14px rgba(217, 43, 56, 0.32);
+}
+.brand-logo-wrap::after {
+  background: #f2b84b;
+  box-shadow: 0 0 7px #f2b84b;
+}
+
+.sidebar,
+.panel,
+.console-panel,
+.card,
+.wm-card,
+.wm-detail,
+.user-card,
+.loader-card,
+.modal {
+  backdrop-filter: blur(calc(var(--glass-o) * 20px)) saturate(140%);
+  -webkit-backdrop-filter: blur(calc(var(--glass-o) * 20px)) saturate(140%);
+  box-shadow: 0 10px 28px -10px rgba(5, 2, 4, 0.70), inset 0 1px 0 rgba(245, 240, 246, 0.05);
+}
+
+/* Gilded hairpin specular highlights on cards */
+.card::before,
+.wm-card::before,
+.wm-detail::before,
+.loader-card::before {
+  background: linear-gradient(90deg, transparent, rgba(242, 184, 75, 0.40) 40%, rgba(217, 43, 56, 0.45) 62%, transparent);
+}
+
+.card:hover,
+.wm-card:hover {
+  background: rgba(30, 15, 20, 0.88);
+  border-color: rgba(242, 184, 75, 0.48);
+}
+
+.card.active,
+.wm-card.sel {
+  background: rgba(28, 13, 18, 0.90);
+  border-color: rgba(217, 43, 56, 0.75);
+  box-shadow: inset 3px 0 0 rgba(217, 43, 56, 0.90), 0 0 0 1px rgba(217, 43, 56, 0.55), 0 8px 24px -6px rgba(217, 43, 56, 0.34);
+}
+
+/* Feature cards — ceremonial double frame: gold hairline second rail
+   below the top specular, plus the always-on kanzashi star filigree */
+.card {
+  box-shadow: inset 0 3px 0 -2px rgba(242, 184, 75, 0.40), 0 10px 28px -10px rgba(5, 2, 4, 0.70), inset 0 1px 0 rgba(245, 240, 246, 0.05);
+}
+.card::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, #ec3e4b 0%, #d92b38 24%, #ffd97d 40%, #f2b84b 100%);
+  -webkit-mask: var(--hsin-kanzashi) center / contain no-repeat;
+  mask: var(--hsin-kanzashi) center / contain no-repeat;
+  filter: drop-shadow(0 0 4px rgba(242, 184, 75, 0.55));
+  opacity: 0.85;
+  pointer-events: none;
+  transition: filter 0.25s, opacity 0.25s, transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.card.active::after {
+  width: 15px;
+  height: 15px;
+  opacity: 1;
+  transform: rotate(45deg);
+  filter: drop-shadow(0 0 7px rgba(242, 184, 75, 0.80)) drop-shadow(0 0 14px rgba(217, 43, 56, 0.40));
+}
+
+/* Weapon cards — sunken lacquer trays so tiles read as surfaces,
+   with a gold hairline icon bezel that survives over the artwork */
+.wm-card {
+  background: rgba(15, 9, 12, 0.74);
+  border-color: rgba(242, 184, 75, 0.16);
+}
+.wm-ic {
+  border-color: rgba(242, 184, 75, 0.38);
+  background: rgba(10, 6, 9, 0.72);
+  box-shadow: inset 0 0 8px rgba(242, 184, 75, 0.10), 0 0 8px rgba(242, 184, 75, 0.08);
+}
+
+/* Connection-info wells — individual shrine-lacquer cells with a gilded
+   hairline, faint pond-ripple watermark, gold labels, silver values */
+.kv {
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid rgba(242, 184, 75, 0.22);
+  background:
+    repeating-radial-gradient(circle at 112% 124%, transparent 0 18px, rgba(242, 184, 75, 0.035) 18px 19px),
+    rgba(11, 7, 10, 0.55);
+}
+.kv-k {
+  color: rgba(242, 184, 75, 0.72);
+}
+
+.card.active .card-icon,
+.card.active .cat-badge {
+  color: var(--accent-soft);
+  border-color: rgba(242, 184, 75, 0.42);
+  background: rgba(217, 43, 56, 0.16);
+}
+
+/* Sidebar navigation — scarlet plume rail + moonlit active label */
+.nav-item:hover {
+  background: rgba(242, 184, 75, 0.09);
+}
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(217, 43, 56, 0.22) 0%, rgba(242, 184, 75, 0.07) 100%);
+  border-color: rgba(242, 184, 75, 0.34);
+  color: #f5f0f6;
+}
+.nav-item.active svg {
+  color: var(--accent-soft);
+}
+
+/* Count badges — chamfered shrine omamori talisman tags */
+.nav-count {
+  border-radius: 2px;
+  clip-path: polygon(18% 0, 82% 0, 100% 50%, 82% 100%, 18% 100%, 0 50%);
+  padding: 2px 9px;
+  background: linear-gradient(160deg, #9e1924 0%, #63101a 100%);
+  color: #ffe9d9;
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(242, 184, 75, 0.28), 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.nav-item.active .nav-count {
+  background: linear-gradient(160deg, #d92b38 0%, #9e1924 100%);
+  color: #fff6ea;
+  box-shadow: inset 0 0 0 1px rgba(242, 184, 75, 0.45), 0 0 9px rgba(217, 43, 56, 0.42);
+}
+
+/* Toggle switch — gilded kanzashi star-blossom in a talisman slot.
+   OFF: a frosted moonlight-silver star resting in the ebony groove. */
+.switch {
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(10, 6, 9, 0.94), rgba(20, 12, 16, 0.94));
+  border-color: rgba(242, 184, 75, 0.20);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.62), inset 0 -1px 0 rgba(242, 184, 75, 0.08);
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.2s;
+}
+.switch .knob {
+  border-radius: 0;
+  background: radial-gradient(circle at 38% 30%, #fdf9fc 0%, #d8cedc 55%, #b8a7bb 100%);
+  -webkit-mask: var(--hsin-kanzashi) center / contain no-repeat;
+  mask: var(--hsin-kanzashi) center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 4px rgba(245, 240, 246, 0.45));
+  transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.2), background 0.2s, filter 0.25s;
+}
+/* ON: the star turns 45° and ignites into molten foxfire gold */
+.switch.on {
+  background: linear-gradient(180deg, rgba(62, 22, 26, 0.96), rgba(36, 14, 19, 0.96));
+  border-color: rgba(242, 184, 75, 0.52);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.55), 0 0 13px rgba(242, 184, 75, 0.20);
+}
+.switch.on .knob {
+  transform: translateX(18px) rotate(45deg);
+  background: radial-gradient(circle at 38% 30%, #ffd97d 0%, #f2b84b 50%, #d92b38 115%);
+  filter: drop-shadow(0 0 7px rgba(242, 184, 75, 0.75)) drop-shadow(0 0 14px rgba(217, 43, 56, 0.45));
+}
+.sub-row .switch.on .knob {
+  transform: translateX(14px) rotate(45deg);
+}
+
+/* Primary & apply buttons — scarlet momiji lacquer gradient */
+.btn-primary,
+.btn-apply,
+.wm-btn:not(.ghost):not(.danger),
+.tp-btn.accent {
+  background: linear-gradient(135deg, #d92b38 0%, #9e1924 100%);
+  color: #fff8f6;
+  border: 1px solid rgba(242, 184, 75, 0.40);
+  box-shadow: 0 0 14px rgba(217, 43, 56, 0.30);
+}
+.btn-primary:hover:not(:disabled),
+.btn-apply:hover:not(:disabled),
+.wm-btn:not(.ghost):not(.danger):hover:not(:disabled),
+.tp-btn.accent:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ec3e4b 0%, #b01f2b 100%);
+  box-shadow: 0 0 18px rgba(217, 43, 56, 0.52);
+}
+
+/* Combo dropdowns & hover states */
+.combo-btn:hover,
+.tp-btn:hover {
+  border-color: rgba(242, 184, 75, 0.55);
+  background: rgba(48, 26, 33, 0.88);
+}
+.combo-menu {
+  background: rgba(19, 12, 16, 0.95);
+  backdrop-filter: blur(16px);
+  border-color: rgba(242, 184, 75, 0.38);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(217, 43, 56, 0.16);
+}
+.combo-opt.sel {
+  background: rgba(217, 43, 56, 0.18);
+  border-left-color: var(--accent);
+  color: var(--accent-soft);
+}
+
+/* Custom scrollbar — scarlet & gold ribbon */
+* {
+  scrollbar-color: rgba(217, 43, 56, 0.45) transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(242, 184, 75, 0.55), rgba(217, 43, 56, 0.35));
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(242, 184, 75, 0.85), rgba(217, 43, 56, 0.65));
+  background-clip: padding-box;
+}
+
+/* Console & detail — the mirror pond itself: concentric golden
+   ripple arcs through obsidian lacquer, rimmed by a gold hairline */
+.console-panel {
+  position: relative;
+  background-color: rgba(14, 8, 12, 0.38);
+  background-image: radial-gradient(120% 55% at 50% 0%, rgba(242, 184, 75, 0.10) 0%, transparent 62%);
+}
+.console-panel .panel-title svg {
+  color: #f2b84b;
+  filter: drop-shadow(0 0 6px rgba(242, 184, 75, 0.55));
+}
+.wm-detail {
+  background-color: rgba(14, 8, 12, 0.38);
+}
+.console-output {
+  background-color: rgba(11, 7, 10, 0.82);
+  background-image:
+    repeating-radial-gradient(circle at 88% 112%, transparent 0 26px, rgba(242, 184, 75, 0.075) 26px 27px),
+    repeating-radial-gradient(circle at 8% -12%, transparent 0 34px, rgba(217, 43, 56, 0.055) 34px 35px),
+    radial-gradient(120% 50% at 50% 0%, rgba(242, 184, 75, 0.07) 0%, transparent 60%);
+  border-color: rgba(242, 184, 75, 0.20);
+  box-shadow: inset 0 0 0 1px rgba(242, 184, 75, 0.10), inset 0 3px 14px rgba(0, 0, 0, 0.55);
+}
+.loading-overlay {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(217, 43, 56, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(10, 7, 11, 0.84) 0%, rgba(12, 8, 11, 0.90) 100%),
+    var(--theme-bg-image, url("/styles/hsin/bg.webp")) center 40% / cover no-repeat;
+}
+
+/* ═══ Ornament layer — the kitsune relics, applied with discipline ═══ */
+
+/* Active nav item — vertical gold→scarlet kitsune plume bar */
+.nav-item.active::before {
+  width: 3px;
+  top: 6px;
+  bottom: 6px;
+  background: linear-gradient(180deg, #f2b84b 0%, #d92b38 55%, #9e1924 100%);
+  box-shadow: 0 0 10px rgba(217, 43, 56, 0.62), 1px 0 6px rgba(242, 184, 75, 0.28);
+}
+.nav-item.active svg {
+  color: #f2b84b;
+  filter: drop-shadow(0 0 4px rgba(242, 184, 75, 0.45));
+}
+
+/* Detail panel — lantern-pond bloom + concentric ripple arcs */
+.wm-detail {
+  background-image:
+    radial-gradient(120% 40% at 50% 0%, rgba(242, 184, 75, 0.07) 0%, transparent 55%),
+    repeating-radial-gradient(circle at 96% 108%, transparent 0 30px, rgba(242, 184, 75, 0.040) 30px 31px);
+  background-size: auto, auto;
+}
+
+/* Sub-section labels carry a tiny gilded kanzashi star marker */
+.subpanel-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.subpanel-title::before {
+  content: '';
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #ffd97d, #f2b84b);
+  -webkit-mask: var(--hsin-kanzashi) center / contain no-repeat;
+  mask: var(--hsin-kanzashi) center / contain no-repeat;
+  filter: drop-shadow(0 0 4px rgba(242, 184, 75, 0.45));
+}
+
+/* Always-on marker — molten kanzashi star, not a plain dot */
+.always-on-badge::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  transform: none;
+  background: linear-gradient(180deg, #ffd97d, #f2b84b);
+  -webkit-mask: var(--hsin-kanzashi) center / contain no-repeat;
+  mask: var(--hsin-kanzashi) center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 5px rgba(242, 184, 75, 0.60));
+}
+
+/* Panel titles — icon catches foxfire */
+.panel-title svg {
+  filter: drop-shadow(0 0 5px rgba(242, 184, 75, 0.35));
+}
+
+/* Page & loader titles — shrine-inscription capitals in Marcellus */
+.section-title,
+.loader-title {
+  font-family: 'Marcellus', 'Manrope', serif;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  color: #f5f0f6;
+  text-shadow: 0 0 14px rgba(217, 43, 56, 0.45), 0 1px 8px rgba(0, 0, 0, 0.55);
+}
+
+/* Carets — scarlet foxfire insertion point */
+input,
+textarea {
+  caret-color: #ec3e4b;
+}
+
+/* Range sliders — the thumb is a molten kanzashi star matching the
+   toggle jewels, riding a scarlet-gold lacquer groove */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border: none;
+  border-radius: 0;
+  background: radial-gradient(circle at 38% 30%, #ffd97d 0%, #f2b84b 55%, #d92b38 115%);
+  -webkit-mask: var(--hsin-kanzashi) center / contain no-repeat;
+  mask: var(--hsin-kanzashi) center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(242, 184, 75, 0.70));
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border: none;
+  border-radius: 0;
+  background: radial-gradient(circle at 38% 30%, #ffd97d 0%, #f2b84b 55%, #d92b38 115%);
+  -webkit-mask: var(--hsin-kanzashi) center / contain no-repeat;
+  mask: var(--hsin-kanzashi) center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(242, 184, 75, 0.70));
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, rgba(242, 184, 75, 0.28), rgba(217, 43, 56, 0.30));
+  border-radius: 3px;
+}
+input[type="range"]::-moz-range-track {
+  background: linear-gradient(90deg, rgba(242, 184, 75, 0.28), rgba(217, 43, 56, 0.30));
+  border-radius: 3px;
+}
+
+/* Detail-panel icon — large gilded bezel over the pond */
+.wm-d-icon {
+  border-color: rgba(242, 184, 75, 0.42);
+  background: rgba(10, 6, 9, 0.70);
+  box-shadow: inset 0 0 14px rgba(242, 184, 75, 0.12), 0 0 16px rgba(242, 184, 75, 0.10);
+}
+
+/* Status & telemetry chips — gold-lacquer edges */
+.status-pill,
+.tech-tag,
+.tp-stat {
+  border-color: rgba(242, 184, 75, 0.30);
+}
+.status-pill.ready {
+  border-color: rgba(245, 240, 246, 0.42);
+}
+.user-card-role {
+  color: var(--accent-soft);
+  border-color: rgba(242, 184, 75, 0.32);
+  background: rgba(242, 184, 75, 0.10);
+}
+
+/* Combo option hover — moonlit gold */
+.combo-opt:hover {
+  color: #f5f0f6;
+  background: rgba(242, 184, 75, 0.10);
+}
+
+/* Sidebar search — gold hairline well with foxfire icon */
+.side-search .search-wrap {
+  border-color: rgba(242, 184, 75, 0.34);
+  background: rgba(11, 7, 10, 0.62);
+}
+.search-wrap svg {
+  color: rgba(242, 184, 75, 0.70);
+}
+
+/* Region modal — scarlet shrine doors on obsidian lacquer */
+.modal {
+  border-color: rgba(242, 184, 75, 0.34);
+  box-shadow: 0 0 0 1px rgba(217, 43, 56, 0.20), 0 24px 60px rgba(0, 0, 0, 0.72);
+}
+.modal-confirm {
+  background: linear-gradient(135deg, #d92b38 0%, #9e1924 100%);
+  border: 1px solid rgba(242, 184, 75, 0.42);
+}
+.region-option:hover {
+  border-color: rgba(242, 184, 75, 0.45);
+}
+
+/* Inputs — gold hairlines stay visible over the scarlet artwork */
+.field,
+.side-search .search-wrap,
+.combo-btn,
+input[type="range"] {
+  border-color: rgba(242, 184, 75, 0.30);
+}
+.field:focus,
+.side-search .search-wrap:focus-within {
+  border-color: rgba(242, 184, 75, 0.55);
+  box-shadow: 0 0 0 1px rgba(242, 184, 75, 0.18), 0 0 12px rgba(242, 184, 75, 0.10);
+}
+.combo.open .combo-btn {
+  border-color: rgba(242, 184, 75, 0.55);
+  box-shadow: 0 0 0 1px rgba(242, 184, 75, 0.25), 0 0 12px rgba(242, 184, 75, 0.15);
+}
+
+/* Status pips — 4-point diamonds: moonlight ready, foxfire attached */
+.status-pill .status-dot::before {
+  border-radius: 1px;
+  transform: rotate(45deg) scale(0.82);
+}
+.status-pill.ready .status-dot::before {
+  background: #f5f0f6;
+  box-shadow: 0 0 7px rgba(245, 240, 246, 0.70);
+}
+.status-pill.attached .status-dot::before {
+  background: #ffb054;
+  box-shadow: 0 0 7px rgba(255, 158, 68, 0.80);
+  animation: pip-flare 1.8s ease-in-out infinite;
+}
+@keyframes pip-flare {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 158, 68, 0.60); }
+  50%      { box-shadow: 0 0 10px rgba(255, 158, 68, 0.95), 0 0 18px rgba(255, 158, 68, 0.45); }
+}
+/* Attached state — chamfered foxfire-amber talisman tag */
+.status-pill.attached {
+  clip-path: polygon(7px 0, 100% 0, 100% 100%, 0 100%, 0 7px);
+  background: linear-gradient(160deg, rgba(255, 158, 68, 0.18), rgba(158, 25, 36, 0.22));
+  border-color: transparent;
+  color: #ffc98a;
+}
+.tech-tag.online::before {
+  box-shadow: 0 0 7px rgba(242, 184, 75, 0.75);
+}
+
+/* Selection — momiji scarlet wash */
+::selection {
+  background: rgba(158, 25, 36, 0.65);
+  color: #fff6ea;
+}
+
+/* ═══ Ambient layer — midnight mirror-pond air ═══
+   Four pseudo-layers above the artwork, below the UI (z-index:-1):
+     html::before → golden pond caustics + scarlet canopy breathing
+     html::after  → midnight plum vignette pulsing at the edges
+     body::before → firefly sparks rising off the water surface
+     body::after  → scarlet & gold momiji leaves on the night wind  */
+
+/* Pond caustics — warm reflection bloom undulating over the water,
+   scarlet canopy glow breathing in the top-left maples */
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 46% 30% at 70% 90%, rgba(242, 184, 75, 0.13) 0%, transparent 62%),
+    radial-gradient(ellipse 40% 27% at 18% 5%, rgba(217, 43, 56, 0.13) 0%, transparent 60%);
+  animation: pond-breathe 11s ease-in-out infinite;
+}
+@keyframes pond-breathe {
+  0%, 100% { opacity: 0.60; transform: translate(-1.4%, 0) scale(1); }
+  50%      { opacity: 1;    transform: translate(1.4%, 1%) scale(1.05); }
+}
+
+/* Midnight vignette — the dark edges tighten and loosen slowly */
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(125% 125% at 50% 44%, transparent 54%, rgba(8, 4, 7, 0.42) 82%, rgba(6, 3, 5, 0.66) 100%);
+  animation: hsin-vig 9s ease-in-out infinite alternate;
+}
+@keyframes hsin-vig {
+  from { opacity: 0.55; }
+  to   { opacity: 1; }
+}
+
+/* Firefly sparks — sharp golden motes rising off the mirror pond.
+   Each box-shadow is one mote; the whole field drifts upward. */
+body::before {
+  content: '';
+  position: fixed;
+  left: 0;
+  bottom: -4vh;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
+  background: #ffd97d;
+  box-shadow:
+    8vw -2vh 4px 0 rgba(242, 184, 75, 0.85),
+    16vw -8vh 3px 0 rgba(255, 217, 125, 0.75),
+    24vw -1vh 5px 0 rgba(217, 43, 56, 0.55),
+    33vw -10vh 3px 0 rgba(242, 184, 75, 0.80),
+    42vw -4vh 4px 0 rgba(255, 217, 125, 0.70),
+    51vw -9vh 3px 0 rgba(242, 184, 75, 0.85),
+    60vw -2vh 5px 0 rgba(255, 217, 125, 0.65),
+    68vw -11vh 3px 0 rgba(242, 184, 75, 0.80),
+    76vw -5vh 4px 0 rgba(217, 43, 56, 0.55),
+    84vw -1vh 3px 0 rgba(255, 217, 125, 0.75),
+    92vw -8vh 5px 0 rgba(242, 184, 75, 0.80),
+    45vw -14vh 3px 0 rgba(255, 217, 125, 0.60),
+    14vw -15vh 4px 0 rgba(242, 184, 75, 0.70),
+    72vw -16vh 3px 0 rgba(255, 217, 125, 0.65);
+  animation: firefly-rise 13s linear infinite;
+  opacity: 0;
+}
+@keyframes firefly-rise {
+  0%   { transform: translate(0, 0);        opacity: 0; }
+  9%   { opacity: 0.95; }
+  88%  { opacity: 0.75; }
+  100% { transform: translate(2.5vw, -102vh); opacity: 0; }
+}
+
+/* Momiji leaves — scarlet & gold SVG maple leaves riding a diagonal
+   gust. Three baked colorways at staggered positions and sizes. */
+body::after {
+  content: '';
+  position: fixed;
+  top: -15%;
+  left: -6%;
+  width: 115vw;
+  height: 130vh;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background-image:
+    var(--hsin-leaf-scarlet), var(--hsin-leaf-gold),
+    var(--hsin-leaf-crimson), var(--hsin-leaf-scarlet),
+    var(--hsin-leaf-gold),    var(--hsin-leaf-crimson),
+    var(--hsin-leaf-scarlet), var(--hsin-leaf-gold);
+  background-repeat: no-repeat;
+  background-size: 34px 34px, 24px 24px, 40px 40px, 20px 20px,
+                   30px 30px, 26px 26px, 36px 36px, 22px 22px;
+  background-position: 6% 104%, 20% 110%, 35% 102%, 48% 112%,
+                       61% 106%, 74% 111%, 86% 103%, 96% 109%;
+  filter: drop-shadow(0 0 6px rgba(217, 43, 56, 0.35));
+  animation: momiji-gust 16s linear infinite;
+}
+@keyframes momiji-gust {
+  0%   { transform: translate(0, 0) rotate(0deg);        opacity: 0; }
+  10%  { opacity: 0.60; }
+  50%  { transform: translate(-3vw, -46vh) rotate(2.5deg); opacity: 0.62; }
+  90%  { opacity: 0.45; }
+  100% { transform: translate(4vw, -96vh) rotate(-2deg);   opacity: 0; }
+}
+
+/* ═══ Notifications — a maple leaf touching the pond ═══
+   Each alert drifts down like a falling momiji leaf, settles onto the
+   dark lacquer surface, and sends a ring of golden ripples outward
+   from the foxfire jewel at its heart. */
+
+.notif-container {
+  top: 60px;
+  right: 18px;
+  gap: 10px;
+}
+
+.notif {
+  gap: 12px;
+  padding: 12px 18px 12px 14px;
+  background:
+    radial-gradient(120% 60% at 12% 0%, rgba(242, 184, 75, 0.09) 0%, transparent 55%),
+    repeating-radial-gradient(circle at 96% 108%, transparent 0 24px, rgba(242, 184, 75, 0.045) 24px 25px),
+    rgba(17, 10, 14, 0.95);
+  border-color: rgba(242, 184, 75, 0.30);
+  border-radius: 12px;
+  box-shadow: 0 10px 26px -6px rgba(0, 0, 0, 0.78), inset 0 0 0 1px rgba(242, 184, 75, 0.07);
+  animation: leaf-drop 0.55s cubic-bezier(0.2, 0.85, 0.25, 1.05);
+}
+@keyframes leaf-drop {
+  0%   { opacity: 0; transform: translateY(-22px) rotate(3.5deg) scale(0.94); }
+  62%  { opacity: 1; transform: translateY(2px)  rotate(-0.6deg) scale(1.01); }
+  100% { transform: translateY(0)    rotate(0deg)  scale(1); }
+}
+
+/* Pond ripple — concentric gold rings expanding from the jewel */
+.notif::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 -13px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(242, 184, 75, 0.85);
+  box-shadow: 0 0 10px rgba(242, 184, 75, 0.40), inset 0 0 6px rgba(242, 184, 75, 0.30);
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.2);
+  animation: pond-ripple 0.75s cubic-bezier(0.2, 0.6, 0.3, 1) 0.16s 1 both;
+}
+.notif.error::after {
+  border-color: rgba(255, 92, 106, 0.85);
+  box-shadow: 0 0 10px rgba(255, 92, 106, 0.45), inset 0 0 6px rgba(255, 92, 106, 0.30);
+}
+@keyframes pond-ripple {
+  0%   { transform: scale(0.25); opacity: 0.9; }
+  100% { transform: scale(3.0);  opacity: 0; }
+}
+
+/* The jewel — moonlit silver (info), molten kanzashi (success),
+   scarlet foxfire (error) — rendered as a 4-petal star */
+.notif-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 0;
+  background: radial-gradient(circle at 38% 30%, #f5f0f6 0%, #b8a7bb 55%, #8d7890 100%);
+  -webkit-mask: var(--hsin-kanzashi) center / contain no-repeat;
+  mask: var(--hsin-kanzashi) center / contain no-repeat;
+  box-shadow: none;
+  filter: drop-shadow(0 0 4px rgba(245, 240, 246, 0.40));
+}
+.notif.success .notif-dot {
+  background: radial-gradient(circle at 38% 30%, #ffd97d 0%, #f2b84b 55%, #c98a1e 115%);
+  filter: drop-shadow(0 0 7px rgba(242, 184, 75, 0.80));
+}
+.notif.error .notif-dot {
+  background: radial-gradient(circle at 38% 30%, #ff8b95 0%, #d92b38 55%, #6d101a 115%);
+  filter: drop-shadow(0 0 8px rgba(217, 43, 56, 0.85));
+}
+
+/* Top hairline — a gold thread across the lacquer, not a side bar */
+.notif::before {
+  left: 16%;
+  right: 16%;
+  top: 0;
+  bottom: auto;
+  width: auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(242, 184, 75, 0.45) 50%, transparent);
+  box-shadow: none;
+}
+
+/* Type-tinted lacquer + borders */
+.notif.success {
+  background-color: rgba(20, 15, 11, 0.95);
+  border-color: rgba(242, 184, 75, 0.42);
+}
+.notif.error {
+  background-color: rgba(26, 10, 13, 0.95);
+  border-color: rgba(217, 43, 56, 0.45);
+}
+
+/* Exit — the leaf is lifted off the water on the next gust */
+.notif.out {
+  opacity: 0;
+  transform: translateY(-9px) rotate(1.5deg) scale(0.94);
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Repeat hit — the leaf flutters against the surface again */
+.notif.bump {
+  animation: leaf-flutter 0.32s cubic-bezier(0.2, 1, 0.3, 1);
+}
+@keyframes leaf-flutter {
+  0%   { transform: translateY(0) rotate(0deg); }
+  45%  { transform: translateY(2px) rotate(-1.2deg) scale(0.98); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+/* Repeat counter — a miniature omamori talisman tag */
+.notif-count {
+  border-radius: 2px;
+  clip-path: polygon(16% 0, 84% 0, 100% 50%, 84% 100%, 16% 100%, 0 50%);
+  padding: 1px 8px;
+  background: linear-gradient(160deg, #9e1924 0%, #63101a 100%);
+  color: #ffe9d9;
+  border: none;
+  box-shadow: inset 0 0 0 1px rgba(242, 184, 75, 0.30);
+}
+
+/* ═══ User tuning hooks — toggled from Settings → Theme & Style ═══ */
+
+/* Ambient off — all four mirror-pond layers vanish at once */
+html.no-ambient::before,
+html.no-ambient::after,
+html.no-ambient body::before,
+html.no-ambient body::after {
+  display: none;
+}
+
+/* Grid off — the pond ripples flatten; glows and lacquer stay */
+html.no-grid .console-output {
+  background-image: radial-gradient(120% 50% at 50% 0%, rgba(242, 184, 75, 0.05) 0%, transparent 60%);
+}
+html.no-grid .wm-detail {
+  background-image: radial-gradient(120% 40% at 50% 0%, rgba(242, 184, 75, 0.07) 0%, transparent 55%);
+  background-size: auto;
+}
+html.no-grid .notif {
+  background-image: radial-gradient(120% 60% at 12% 0%, rgba(242, 184, 75, 0.09) 0%, transparent 55%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html::before,
+  html::after,
+  body::before,
+  body::after,
+  .notif::before,
+  .notif::after,
+  .notif-dot {
+    animation: none;
+  }
+}
